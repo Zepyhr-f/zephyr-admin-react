@@ -1,0 +1,44 @@
+{
+  "app": {
+    "name": "Zephyr Admin",
+    "slogan": "Enterprise Admin Dashboard"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "system": "System",
+    "users": "Users",
+    "roles": "Roles",
+    "settings": "Settings"
+  },
+  "user": {
+    "profile": "Profile",
+    "settings": "Account Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "welcome": "Welcome Back"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "auto": "System Default"
+  },
+  "action": {
+    "search": "Search",
+    "reset": "Reset",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "save": "Save",
+    "close": "Close"
+  },
+  "message": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info"
+  }
+}
