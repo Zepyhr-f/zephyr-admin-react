@@ -26,3 +26,8 @@ dist-ssr
 
 # Deployment Records
 deployment_record.md
+
+# Environment variables
+.env
+.env.*
+!.env.example
