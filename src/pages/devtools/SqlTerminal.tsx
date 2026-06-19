@@ -1,14 +1,6 @@
-import { PlaceholderPage } from "@/components/PlaceholderPage";
+import { AdminMetricPage } from "@/components/AdminModulePage";
+import { getSqlStatus } from "@/api/admin-modules";
 
 export function SqlTerminal() {
-  return (
-    <PlaceholderPage
-      title="SQL 终端"
-      description="轻量 Web SQL 面板（生产环境受限）；强调权限、审计与风险控制。"
-      tips={[
-        "限制：只读/白名单库表/最大返回行数/超时",
-        "所有执行必须落操作日志（含 SQL 摘要与风险等级）"
-      ]}
-    />
-  );
+  return <AdminMetricPage title="SQL 终端" description="查看 SQL 终端安全状态。" loader={getSqlStatus} riskNote="SQL 终端生产默认禁用，本阶段不开放真实 SQL 执行能力。" />;
 }

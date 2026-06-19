@@ -1,11 +1,6 @@
-import { PlaceholderPage } from "@/components/PlaceholderPage";
+import { AdminListPage } from "@/components/AdminModulePage";
+import { getParams } from "@/api/admin-modules";
 
 export function Params() {
-  return (
-    <PlaceholderPage
-      title="参数配置"
-      description="动态配置系统运行参数（如文件存储路径、默认密码等）。"
-      tips={["支持灰度/版本回滚（可选）", "关键参数修改要二次确认 + 留痕"]}
-    />
-  );
+  return <AdminListPage title="参数配置" description="维护系统运行参数。" loader={getParams} riskNote="敏感参数值必须遮蔽，不得在页面、日志或文档中展示真实密钥。" />;
 }

@@ -1,4 +1,4 @@
-import client from './client'; // force vite hmr
+import client from './client';
 import type { PageResult } from './role';
 
 export interface PostVO {
@@ -19,21 +19,10 @@ export interface PostForm {
 }
 
 export const getPostPage = (params: { current: number; size: number; postName?: string; status?: number }) => {
-  return client.get<PageResult<PostVO>>('/zephyr-system/post/list', { params });
+  return client.get<PageResult<PostVO>>('/api/v1/system/post/list', { params });
 };
 
-export const savePost = (data: PostForm) => {
-  return client.post('/zephyr-system/post/save', data);
-};
-
-export const updatePost = (data: PostForm) => {
-  return client.post('/zephyr-system/post/update', data);
-};
-
-export const removePosts = (codes: string[]) => {
-  return client.post('/zephyr-system/post/remove', codes);
-};
-
-export const updatePostStatus = (code: string, status: number) => {
-  return client.post('/zephyr-system/post/status', { code, status });
-};
+export const savePost = (data: PostForm) => client.post('/api/v1/system/post/save', data);
+export const updatePost = (data: PostForm) => client.post('/api/v1/system/post/update', data);
+export const removePosts = (codes: string[]) => client.post('/api/v1/system/post/remove', { codes });
+export const updatePostStatus = (code: string, status: number) => client.post('/api/v1/system/post/status', { code, status });

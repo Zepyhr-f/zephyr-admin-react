@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Button, Checkbox, Divider, Form, Input, Space, Typography, message, ConfigProvider } from "antd";
 import { LockOutlined, SafetyCertificateOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router";
-import axios from "axios";
-import { useAuthStore } from "@/store/use-auth-store";
+import { useAuthStore, type MenuItem } from "@/store/use-auth-store";
 import client from "@/api/client";
 import "./login.css";
 
@@ -66,24 +65,20 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { remember, ...loginPayload } = values;
-      const res = await client.post<any, LoginResponse>("zephyr-auth/login", loginPayload);
+      const res = await client.post<LoginResponse>("/api/v1/auth/login", loginPayload);
       const token = res.token;
 
       // 1. 保存 token
       setToken(token);
 
       // 2. 拉取用户信息 & 菜单
-      const headers = { Authorization: `Bearer ${token}` };
-      const baseURL = import.meta.env.VITE_API_BASE_URL;
-      const infoRes = await axios.get(`${baseURL}zephyr-auth/info`, { headers, withCredentials: true });
-      const infoData = infoRes.data?.data;
+      const infoData = await client.get<any>("/api/v1/auth/info");
       if (infoData) {
-        setUserInfo(infoData.user, infoData.roles, infoData.permissions);
+        setUserInfo(infoData.user, infoData.roles, infoData.perms || infoData.permissions || []);
       }
 
-      const menuRes = await axios.get(`${baseURL}zephyr-system/menu/tree`, { headers, withCredentials: true });
-      const menuData = menuRes.data?.data?.list;
-      setMenus(menuData || []);
+      const menuDataResp = await client.get<{ list: MenuItem[] }>("/api/v1/system/menu/tree");
+      setMenus(menuDataResp.list || []);
 
       // 3. 记住我
       if (remember) {

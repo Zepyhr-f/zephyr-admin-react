@@ -1,13 +1,27 @@
-import axios, {type AxiosResponse, type InternalAxiosRequestConfig} from "axios";
+import axios, {type AxiosInstance, type InternalAxiosRequestConfig} from "axios";
 import {useAuthStore} from "../store/use-auth-store.ts";
 import {message, notification} from "antd";
 
+const normalizeBaseURL = (baseURL?: string) => {
+    if (!baseURL) return "";
+    return baseURL.endsWith("/") ? baseURL.slice(0, -1) : baseURL;
+};
+
+export const apiBaseURL = normalizeBaseURL(import.meta.env.VITE_API_BASE_URL);
+
+interface ApiClient extends AxiosInstance {
+    get<T = unknown>(url: string, config?: Parameters<AxiosInstance["get"]>[1]): Promise<T>;
+    post<T = unknown>(url: string, data?: unknown, config?: Parameters<AxiosInstance["post"]>[2]): Promise<T>;
+    put<T = unknown>(url: string, data?: unknown, config?: Parameters<AxiosInstance["put"]>[2]): Promise<T>;
+    delete<T = unknown>(url: string, config?: Parameters<AxiosInstance["delete"]>[1]): Promise<T>;
+}
+
 const client = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: apiBaseURL,
     timeout: 5000,
     headers: {'Content-Type': 'application/json'},
     withCredentials: true, // 允许携带 Cookie（Refresh Token）
-});
+}) as ApiClient;
 
 // 刷新锁机制
 let isRefreshing = false;
@@ -37,7 +51,7 @@ client.interceptors.request.use(
 );
 
 client.interceptors.response.use(
-    (response: AxiosResponse) => {
+    (response) => {
         const { data } = response;
         const { code, msg, data: payload } = data;
 
@@ -66,7 +80,7 @@ client.interceptors.response.use(
                     isRefreshing = true;
                     try {
                         const refreshRes = await axios.post(
-                            `${import.meta.env.VITE_API_BASE_URL}zephyr-auth/auth/refresh`,
+                            `${apiBaseURL}/api/v1/auth/refresh`,
                             {},
                             { withCredentials: true }
                         );

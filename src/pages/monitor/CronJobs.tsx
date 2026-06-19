@@ -1,14 +1,6 @@
-import { PlaceholderPage } from "@/components/PlaceholderPage";
+import { AdminListPage } from "@/components/AdminModulePage";
+import { getCronJobs } from "@/api/admin-modules";
 
 export function CronJobs() {
-  return (
-    <PlaceholderPage
-      title="任务调度"
-      description="在线配置并管理 Cron 定时任务，支持日志追踪与失败重试。"
-      tips={[
-        "表格：任务名/cron/状态/上次运行/下次运行/耗时/负责人",
-        "详情：执行日志 + 参数快照 + 失败原因与重试"
-      ]}
-    />
-  );
+  return <AdminListPage title="任务调度" description="查看调度任务列表和执行状态。" loader={getCronJobs} riskNote="本阶段不开放真实执行、暂停、恢复或删除任务。" />;
 }

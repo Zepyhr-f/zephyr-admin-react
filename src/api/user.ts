@@ -4,7 +4,7 @@ export interface UserVO {
     id: string;
     code: string;
     deptId: string;
-    username: string; // From backend's nickName
+    username: string;
     realName: string;
     email: string;
     phone: string;
@@ -19,7 +19,7 @@ export interface UserVO {
 export interface UserForm {
     id?: string;
     code?: string;
-    nickName: string; // Sent as nickName instead of username to match backend User entity
+    nickName: string;
     realName: string;
     deptCode: string;
     phone?: string;
@@ -28,27 +28,11 @@ export interface UserForm {
     sex?: number;
 }
 
-// User List API
 export const getUserList = (params: { username?: string; phone?: string; status?: number; deptCode?: string }) => {
-    return client.get<UserVO[]>("/zephyr-system/user/list", { params });
+    return client.get<{ list: UserVO[] }>("/api/v1/system/user/list", { params });
 };
 
-// Add or Update User API
-export const submitUser = (data: UserForm) => {
-    return client.post<boolean>("/zephyr-system/user/submit", data);
-};
-
-// Update User Status
-export const updateUserStatus = (id: string, status: number) => {
-    return client.post<boolean>("/zephyr-system/user/updateStatus", { id, status });
-};
-
-// Reset Password
-export const resetUserPassword = (id: string) => {
-    return client.post<boolean>("/zephyr-system/user/resetPassword", { id });
-};
-
-// Delete User
-export const removeUsers = (ids: string[]) => {
-    return client.post<boolean>("/zephyr-system/user/remove", ids);
-};
+export const submitUser = (data: UserForm) => client.post<boolean>("/api/v1/system/user/submit", data);
+export const updateUserStatus = (id: string, status: number) => client.post<boolean>("/api/v1/system/user/updateStatus", { id, status });
+export const resetUserPassword = (id: string) => client.post<boolean>("/api/v1/system/user/resetPassword", { id });
+export const removeUsers = (ids: string[]) => client.post<boolean>("/api/v1/system/user/remove", { ids });

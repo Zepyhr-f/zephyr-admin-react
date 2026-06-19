@@ -28,22 +28,14 @@ export interface PageResult<T> {
     pages: number;
 }
 
-// 分页查询角色列表
 export const getRolePage = (params: { current?: number; size?: number; roleName?: string; status?: number | string }) => {
-    return client.get<PageResult<RoleVO>>("/zephyr-system/role/list", { params });
+    return client.get<PageResult<RoleVO>>("/api/v1/system/role/list", { params });
 };
 
-// 新增或修改角色
-export const submitRole = (data: RoleForm) => {
-    return client.post<boolean>("/zephyr-system/role/submit", data);
-};
-
-// 更新状态
-export const updateRoleStatus = (id: string, status: number) => {
-    return client.post<boolean>("/zephyr-system/role/updateStatus", { id, status });
-};
-
-// 批量删除
-export const removeRoles = (ids: string[]) => {
-    return client.post<boolean>("/zephyr-system/role/remove", ids);
-};
+export const getRoleDetail = (code: string) => client.get("/api/v1/system/role/detail", { params: { code } });
+export const getRoleMenuTree = (code: string) => client.get("/api/v1/system/role/menuTree", { params: { code } });
+export const assignRoleMenus = (roleCode: string, menuCodes: string[]) => client.post("/api/v1/system/role/assignMenus", { roleCode, menuCodes });
+export const updateRoleDataScope = (data: { roleCode: string; dataScope: string; deptCodes?: string[] }) => client.post("/api/v1/system/role/dataScope", data);
+export const submitRole = (data: RoleForm) => client.post<boolean>("/api/v1/system/role/submit", data);
+export const updateRoleStatus = (id: string, status: number) => client.post<boolean>("/api/v1/system/role/updateStatus", { id, status });
+export const removeRoles = (ids: string[]) => client.post<boolean>("/api/v1/system/role/remove", { ids });

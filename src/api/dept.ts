@@ -21,22 +21,7 @@ export interface DeptForm {
     status?: number;
 }
 
-// 获取部门树
-export const getDeptTree = () => {
-    return client.get<DeptVO[]>("/zephyr-system/dept/tree");
-};
-
-// 新增部门
-export const saveDept = (data: DeptForm) => {
-    return client.post<boolean>("/zephyr-system/dept/save", data);
-};
-
-// 修改部门
-export const updateDept = (data: DeptForm) => {
-    return client.post<boolean>("/zephyr-system/dept/update", data);
-};
-
-// 批量删除
-export const removeDepts = (ids: string[]) => {
-    return client.post<boolean>("/zephyr-system/dept/remove", ids);
-};
+export const getDeptTree = () => client.get<{ list: DeptVO[] }>("/api/v1/system/dept/tree");
+export const saveDept = (data: DeptForm) => client.post<boolean>("/api/v1/system/dept/save", data);
+export const updateDept = (data: DeptForm) => client.post<boolean>("/api/v1/system/dept/update", data);
+export const removeDepts = (ids: string[]) => client.post<boolean>("/api/v1/system/dept/remove", { ids });
