@@ -3,6 +3,8 @@ import client, { apiBaseURL } from "./client";
 
 const BASE = "/api/v1/sysadmin/logs";
 
+// ---------- 前端使用的标准化类型（与 LogMonitoring.tsx 字段约定一致） ----------
+
 export interface ServiceItem {
 	name: string;
 	displayName?: string;
@@ -49,33 +51,133 @@ export interface SearchResp {
 	truncated?: boolean;
 }
 
-export const listServices = () =>
-	client.get<{ services: ServiceItem[] }>(`${BASE}/services`);
+// ---------- 后端契约（zephyr-go syslogmon 实际返回结构） ----------
 
-export const listFiles = (svc: string) =>
-	client.get<{ service: string; files: FileItem[] }>(
+interface BackendService {
+	service: string;
+	display: string;
+}
+
+interface BackendFile {
+	name: string;
+	size: number;
+	mtime: string;
+	line_count: number;
+}
+
+interface BackendLogLine {
+	ts?: string;
+	level?: string;
+	logger?: string;
+	service?: string;
+	file?: string;
+	line_no: number;
+	trace?: string;
+	span?: string;
+	msg?: string;
+	raw: string;
+}
+
+interface BackendSearchData {
+	lines: BackendLogLine[];
+	truncated?: boolean;
+}
+
+// ---------- 适配器：把后端 shape 转成前端期望 ----------
+
+function adaptLine(b: BackendLogLine): LogLine {
+	return {
+		lineNo: b.line_no,
+		raw: b.raw,
+		ts: b.ts,
+		level: b.level,
+		msg: b.msg,
+		trace: b.trace,
+		span: b.span,
+		logger: b.logger,
+		service: b.service,
+		file: b.file,
+	};
+}
+
+// 文件名形如 access.log.1 / access.log.1.gz → rotated；access.log → 否
+function inferRotated(name: string): boolean {
+	return /\.log\.\d+(\.gz)?$/.test(name);
+}
+
+function adaptFile(b: BackendFile): FileItem {
+	return {
+		name: b.name,
+		size: b.size,
+		mtime: b.mtime,
+		lines: b.line_count >= 0 ? b.line_count : undefined,
+		rotated: inferRotated(b.name),
+	};
+}
+
+// ---------- API ----------
+
+export async function listServices(): Promise<{ services: ServiceItem[] }> {
+	const raw = await client.get<BackendService[]>(`${BASE}/services`);
+	return {
+		services: (raw || []).map((s) => ({
+			name: s.service,
+			displayName: s.display,
+		})),
+	};
+}
+
+export async function listFiles(
+	svc: string,
+): Promise<{ service: string; files: FileItem[] }> {
+	const raw = await client.get<BackendFile[]>(
 		`${BASE}/services/${encodeURIComponent(svc)}/files`,
 	);
+	return {
+		service: svc,
+		files: (raw || []).map(adaptFile),
+	};
+}
 
-export const readFile = (
+export async function readFile(
 	svc: string,
 	file: string,
 	params: { tail?: number; from_line?: number; limit?: number },
-) =>
-	client.get<ReadResp>(
+): Promise<ReadResp> {
+	const raw = await client.get<BackendLogLine[]>(
 		`${BASE}/services/${encodeURIComponent(svc)}/files/${encodeURIComponent(file)}`,
 		{ params },
 	);
+	const lines = (raw || []).map(adaptLine);
+	const first = lines[0]?.lineNo;
+	const last = lines[lines.length - 1]?.lineNo;
+	return {
+		file,
+		service: svc,
+		lines,
+		from: typeof first === "number" ? first : undefined,
+		to: typeof last === "number" ? last : undefined,
+		// totalLines 后端 read 接口未返回，由 UI 用 file meta 的 lines 字段兜底
+	};
+}
 
-export const searchFile = (
+export async function searchFile(
 	svc: string,
 	file: string,
 	params: { q: string; limit?: number },
-) =>
-	client.get<SearchResp>(
+): Promise<SearchResp> {
+	const raw = await client.get<BackendSearchData>(
 		`${BASE}/services/${encodeURIComponent(svc)}/files/${encodeURIComponent(file)}/search`,
 		{ params },
 	);
+	return {
+		file,
+		service: svc,
+		q: params.q,
+		hits: (raw?.lines || []).map(adaptLine),
+		truncated: raw?.truncated,
+	};
+}
 
 /**
  * 通过 fetch + Authorization 头下载日志文件，浏览器以 Blob 形式触发附件下载。

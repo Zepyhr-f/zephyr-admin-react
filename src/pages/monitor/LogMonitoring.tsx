@@ -214,9 +214,22 @@ function TailTab({ svc, file }: TailTabProps) {
 				if (ev.event === "line") {
 					try {
 						const obj = JSON.parse(ev.data);
+						// 后端 LogLine 用 snake_case (line_no)，前端统一 camelCase (lineNo)
 						const lineNo =
-							typeof obj.lineNo === "number" ? obj.lineNo : ++seqRef.current;
-						const next: LogLine = { lineNo, raw: obj.raw ?? ev.data, ...obj };
+							typeof obj.lineNo === "number"
+								? obj.lineNo
+								: typeof obj.line_no === "number"
+									? obj.line_no
+									: ++seqRef.current;
+						const next: LogLine = {
+							lineNo,
+							raw: obj.raw ?? ev.data,
+							ts: obj.ts,
+							level: obj.level,
+							msg: obj.msg,
+							trace: obj.trace,
+							span: obj.span,
+						};
 						setLines((prev) => {
 							const arr =
 								prev.length >= TAIL_BUFFER_MAX
