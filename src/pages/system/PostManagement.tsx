@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Space, Switch, Modal, Form, Input, InputNumber, Radio, message, Popconfirm, Select, Button } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Space, Switch, Modal, Form, Input, InputNumber, Radio, message, Popconfirm, Select, Button, Tooltip } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { PageShell } from '@/components/PageShell';
 import { DataTable } from '@/components/DataTable';
 import { QueryForm } from '@/components/QueryForm';
@@ -140,17 +140,34 @@ export const PostManagement: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 150,
+      fixed: 'right' as const,
+      width: 100,
       render: (_: any, record: PostVO) => (
-        <Space size="middle">
-          <a className="btn-action-edit" onClick={() => handleEdit(record)}>
-            <EditOutlined /> 编辑
-          </a>
-          <Popconfirm title="确定要删除该岗位吗？" onConfirm={() => handleDelete(record.code)}>
-            <a className="btn-action-delete">
-              <DeleteOutlined /> 删除
-            </a>
-          </Popconfirm>
+        <Space size={12}>
+          <Tooltip title="编辑">
+            <Button
+              className="btn-action-edit"
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            />
+          </Tooltip>
+          <Tooltip title="删除">
+            <Popconfirm
+              title="确认删除？"
+              description={`将永久删除「${record.postName}」`}
+              okText="删除"
+              cancelText="取消"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => handleDelete(record.code)}
+            >
+              <Button
+                className="btn-action-delete"
+                shape="circle"
+                icon={<DeleteOutlined />}
+              />
+            </Popconfirm>
+          </Tooltip>
         </Space>
       ),
     },
@@ -193,9 +210,14 @@ export const PostManagement: React.FC = () => {
         }}
         onChange={handleTableChange}
         extraActions={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            新增岗位
-          </Button>
+          <Space size={8}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+              新增
+            </Button>
+            <Button icon={<ReloadOutlined />} onClick={() => fetchData()}>
+              刷新
+            </Button>
+          </Space>
         }
       />
 
@@ -204,8 +226,10 @@ export const PostManagement: React.FC = () => {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={() => setIsModalVisible(false)}
+        okText="保存"
+        cancelText="取消"
         destroyOnClose
-        width={500}
+        width={600}
       >
         <Form form={form} layout="vertical" preserve={false}>
           {modalMode === 'edit' && <Form.Item name="id" hidden><Input /></Form.Item>}

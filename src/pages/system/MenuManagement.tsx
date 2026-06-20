@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -179,18 +179,26 @@ export function MenuManagement() {
       dataIndex: "status",
       width: 100,
       render: (status: number, record) => (
-        <Switch
-          checked={status === 1}
-          onChange={(checked) => onStatusChange(checked, record)}
-          checkedChildren="正常"
-          unCheckedChildren="停用"
-        />
+        <Popconfirm
+          title="确认变更状态？"
+          description={`「${record.menuName}」将被${status === 1 ? '停用' : '启用'}`}
+          okText="确认"
+          cancelText="取消"
+          onConfirm={() => onStatusChange(status !== 1, record)}
+        >
+          <Switch
+            checked={status === 1}
+            checkedChildren="启用"
+            unCheckedChildren="停用"
+          />
+        </Popconfirm>
       ),
     },
     {
       title: "操作",
       key: "actions",
-      width: 160,
+      fixed: "right" as const,
+      width: 140,
       render: (_, record) => (
         <Space size={12}>
           <Tooltip title="新增下级">
@@ -200,7 +208,14 @@ export function MenuManagement() {
             <Button className="btn-action-edit" shape="circle" icon={<EditOutlined />} onClick={() => openEditModal(record)} />
           </Tooltip>
           <Tooltip title="删除">
-            <Popconfirm title="确定删除该菜单吗？" onConfirm={() => onDelete(record)}>
+            <Popconfirm
+              title="确认删除？"
+              description={`将永久删除「${record.menuName}」`}
+              okText="删除"
+              cancelText="取消"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => onDelete(record)}
+            >
               <Button className="btn-action-delete" shape="circle" icon={<DeleteOutlined />} />
             </Popconfirm>
           </Tooltip>
@@ -218,9 +233,12 @@ export function MenuManagement() {
         loading={loading}
         pagination={false}
         extraActions={
-          <Space>
+          <Space size={8}>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => openAddModal()}>
-              新增顶级菜单
+              新增
+            </Button>
+            <Button icon={<ReloadOutlined />} onClick={() => fetchData()}>
+              刷新
             </Button>
           </Space>
         }

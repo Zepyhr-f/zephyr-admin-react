@@ -35,7 +35,7 @@ export function OperationLog() {
         { title: "时间", dataIndex: "createdAt" },
         { title: "操作", render: (_: any, r: any) => <Button type="link" onClick={() => showDetail(String(r.id))}>详情</Button> },
       ]}
-      extraActions={<Space><Button icon={<ReloadOutlined />} onClick={() => fetchData(form.getFieldsValue())}>刷新</Button><Popconfirm title="确认删除选中操作日志？" onConfirm={removeSelected} disabled={!selected.length}><Button danger icon={<DeleteOutlined />} disabled={!selected.length}>删除选中</Button></Popconfirm><Popconfirm title="确认清空操作日志？" onConfirm={clearAll}><Button danger>清空日志</Button></Popconfirm></Space>}
+      extraActions={<Space size={8}><Button icon={<ReloadOutlined />} onClick={() => fetchData(form.getFieldsValue())}>刷新</Button><Popconfirm title="确认删除选中？" description={`共 ${selected.length} 条，将不可恢复`} okText="删除" cancelText="取消" okButtonProps={{ danger: true }} onConfirm={removeSelected} disabled={!selected.length}><Button danger icon={<DeleteOutlined />} disabled={!selected.length}>删除选中</Button></Popconfirm><Popconfirm title="确认清空全部？" description="此操作不可恢复，将进入操作审计" okText="清空" cancelText="取消" okButtonProps={{ danger: true }} onConfirm={clearAll}><Button danger>清空日志</Button></Popconfirm></Space>}
     />
     <Drawer title="操作日志详情" open={!!detail} onClose={() => setDetail(null)} width={620}>
       <Descriptions bordered column={1} size="small">{Object.entries(detail ?? {}).map(([k, v]) => <Descriptions.Item key={k} label={k}>{typeof v === "object" ? JSON.stringify(v) : String(v ?? "")}</Descriptions.Item>)}</Descriptions>

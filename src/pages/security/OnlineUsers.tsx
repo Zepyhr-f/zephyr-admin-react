@@ -21,7 +21,7 @@ export function OnlineUsers() {
     </QueryForm>
     <DataTable rowKey={(r) => String(r.id)} loading={loading} rowSelection={{ selectedRowKeys: selected, onChange: setSelected }} dataSource={rows}
       columns={[{ title: "用户", dataIndex: "username" }, { title: "IP", dataIndex: "ip" }, { title: "UserAgent", dataIndex: "userAgent", ellipsis: true }, { title: "登录时间", dataIndex: "loginTime" }, { title: "最后活跃", dataIndex: "lastActiveAt" }, { title: "状态", dataIndex: "status", render: (v) => <Tag color={v === "online" ? "green" : "red"}>{String(v)}</Tag> }]}
-      extraActions={<Space><Button icon={<ReloadOutlined />} onClick={() => fetchData(form.getFieldsValue())}>刷新</Button><Popconfirm title="确认踢出选中用户？" onConfirm={kickout} disabled={!selected.length}><Button danger icon={<DisconnectOutlined />} disabled={!selected.length}>踢出选中</Button></Popconfirm></Space>}
+      extraActions={<Space size={8}><Button icon={<ReloadOutlined />} onClick={() => fetchData(form.getFieldsValue())}>刷新</Button><Popconfirm title="确认踢出选中？" description={`共 ${selected.length} 个会话，将被强制下线`} okText="踢出" cancelText="取消" okButtonProps={{ danger: true }} onConfirm={kickout} disabled={!selected.length}><Button danger icon={<DisconnectOutlined />} disabled={!selected.length}>踢出选中</Button></Popconfirm></Space>}
     />
   </PageShell>;
 }

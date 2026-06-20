@@ -57,10 +57,10 @@ export function LoginLog() {
           { title: "登录时间", dataIndex: "loginTime" },
         ]}
         dataSource={rows}
-        extraActions={<Space>
+        extraActions={<Space size={8}>
           <Button icon={<ReloadOutlined />} onClick={() => fetchData(form.getFieldsValue())}>刷新</Button>
-          <Popconfirm title="确认删除选中登录日志？" onConfirm={removeSelected} disabled={!selected.length}><Button danger icon={<DeleteOutlined />} disabled={!selected.length}>删除选中</Button></Popconfirm>
-          <Popconfirm title="确认清空登录日志？该操作会进入操作审计。" onConfirm={clearAll}><Button danger>清空日志</Button></Popconfirm>
+          <Popconfirm title="确认删除选中？" description={`共 ${selected.length} 条，将不可恢复`} okText="删除" cancelText="取消" okButtonProps={{ danger: true }} onConfirm={removeSelected} disabled={!selected.length}><Button danger icon={<DeleteOutlined />} disabled={!selected.length}>删除选中</Button></Popconfirm>
+          <Popconfirm title="确认清空全部？" description="此操作不可恢复，将进入操作审计" okText="清空" cancelText="取消" okButtonProps={{ danger: true }} onConfirm={clearAll}><Button danger>清空日志</Button></Popconfirm>
         </Space>}
       />
     </PageShell>
